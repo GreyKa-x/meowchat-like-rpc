@@ -30,7 +30,7 @@ type (
 func (c customScoreModel) InsertMany(ctx context.Context, scores []Score) error {
 	createAt := time.Now()
 	updateAt := time.Now()
-	data := make([]interface{}, len(scores), len(scores))
+	data := make([]interface{}, len(scores))
 	for i := 0; i < len(scores); i++ {
 		if scores[i].ID.IsZero() {
 			scores[i].ID = primitive.NewObjectID()

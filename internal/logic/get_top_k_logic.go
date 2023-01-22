@@ -43,6 +43,9 @@ func (l *GetTopKLogic) GetTopK(in *pb.GetTopKReq) (*pb.GetTopKResp, error) {
 				return nil, err
 			}
 			_, err = l.svcCtx.Redis.ZaddsCtx(l.ctx, cachekey, aggrToPair(data)...)
+			if err != nil {
+				return nil, err
+			}
 			err = l.svcCtx.Redis.Expire(cachekey, getExpireTime(in.Range))
 			if err != nil {
 				return nil, err

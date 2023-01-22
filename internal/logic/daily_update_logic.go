@@ -39,7 +39,7 @@ func (l *DailyUpdateLogic) DailyUpdate(in *pb.DailyUpdateReq) (*pb.DailyUpdateRe
 			return nil, err
 		}
 		tname := zkey[6:]
-		data := make([]model.Score, len(t), len(t))
+		data := make([]model.Score, len(t))
 		for i := 0; i < len(data); i++ {
 			data[i].Score = t[i].Score
 			data[i].Sid = t[i].Key
