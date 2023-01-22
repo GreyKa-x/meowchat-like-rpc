@@ -9,13 +9,15 @@ import (
 type ServiceContext struct {
 	Config config.Config
 	model.LikeModel
+	model.ScoreModel
 	*redis.Redis
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
-		Config:    c,
-		LikeModel: model.NewLikeModel(c.Mongo.URL, c.Mongo.DB, model.LikeCollectionName, c.CacheConf),
-		Redis:     c.Redis.NewRedis(),
+		Config:     c,
+		LikeModel:  model.NewLikeModel(c.Mongo.URL, c.Mongo.DB, model.LikeCollectionName, c.CacheConf),
+		ScoreModel: model.NewScoreModel(c.Mongo.URL, c.Mongo.DB, model.ScoreCollectionName),
+		Redis:      c.Redis.NewRedis(),
 	}
 }
