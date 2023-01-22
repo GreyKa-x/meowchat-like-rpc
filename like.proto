@@ -69,6 +69,33 @@ message DailyUpdateReq {
 
 }
 
+
+// 获取猫咪人气
+message ListCatPopularityReq {
+  repeated string catId = 1;
+}
+message CatPop {
+  string catId = 1;
+  int64 popularity = 2;
+}
+message ListCatPopularityResp {
+  repeated CatPop cats = 1;
+}
+// 操作猫咪人气
+message AddCatPopularityReq {
+  string catId = 1;
+  int64 val = 2;
+}
+message AddCatPopularityResp {
+}
+// 查看 topk 猫咪
+message ListTopCatReq {
+  int64 k = 1;
+}
+message ListTopCatResp {
+  repeated CatPop cats = 1;
+}
+
 service like {
   // 点赞/取消赞
   rpc DoLike(DoLikeReq) returns (DoLikeResp) {}
@@ -82,4 +109,9 @@ service like {
   rpc GetTopK(GetTopKReq) returns (GetTopKResp) {}
   rpc AddScore(AddScoreReq) returns (AddScoreResp) {}
   rpc DailyUpdate(DailyUpdateReq) returns (DailyUpdateResp) {}
+
+  // popularity
+  rpc ListCatPopularity(ListCatPopularityReq) returns (ListCatPopularityResp) {}
+  rpc AddCatPopularity(AddCatPopularityReq) returns (AddCatPopularityResp) {}
+  rpc ListTopCat(ListTopCatReq) returns (ListTopCatResp) {}
 }

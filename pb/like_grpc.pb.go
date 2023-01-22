@@ -31,6 +31,10 @@ type LikeClient interface {
 	GetTopK(ctx context.Context, in *GetTopKReq, opts ...grpc.CallOption) (*GetTopKResp, error)
 	AddScore(ctx context.Context, in *AddScoreReq, opts ...grpc.CallOption) (*AddScoreResp, error)
 	DailyUpdate(ctx context.Context, in *DailyUpdateReq, opts ...grpc.CallOption) (*DailyUpdateResp, error)
+	// popularity
+	ListCatPopularity(ctx context.Context, in *ListCatPopularityReq, opts ...grpc.CallOption) (*ListCatPopularityResp, error)
+	AddCatPopularity(ctx context.Context, in *AddCatPopularityReq, opts ...grpc.CallOption) (*AddCatPopularityResp, error)
+	ListTopCat(ctx context.Context, in *ListTopCatReq, opts ...grpc.CallOption) (*ListTopCatResp, error)
 }
 
 type likeClient struct {
@@ -95,6 +99,33 @@ func (c *likeClient) DailyUpdate(ctx context.Context, in *DailyUpdateReq, opts .
 	return out, nil
 }
 
+func (c *likeClient) ListCatPopularity(ctx context.Context, in *ListCatPopularityReq, opts ...grpc.CallOption) (*ListCatPopularityResp, error) {
+	out := new(ListCatPopularityResp)
+	err := c.cc.Invoke(ctx, "/like.like/ListCatPopularity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *likeClient) AddCatPopularity(ctx context.Context, in *AddCatPopularityReq, opts ...grpc.CallOption) (*AddCatPopularityResp, error) {
+	out := new(AddCatPopularityResp)
+	err := c.cc.Invoke(ctx, "/like.like/AddCatPopularity", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *likeClient) ListTopCat(ctx context.Context, in *ListTopCatReq, opts ...grpc.CallOption) (*ListTopCatResp, error) {
+	out := new(ListTopCatResp)
+	err := c.cc.Invoke(ctx, "/like.like/ListTopCat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LikeServer is the server API for Like service.
 // All implementations must embed UnimplementedLikeServer
 // for forward compatibility
@@ -108,6 +139,10 @@ type LikeServer interface {
 	GetTopK(context.Context, *GetTopKReq) (*GetTopKResp, error)
 	AddScore(context.Context, *AddScoreReq) (*AddScoreResp, error)
 	DailyUpdate(context.Context, *DailyUpdateReq) (*DailyUpdateResp, error)
+	// popularity
+	ListCatPopularity(context.Context, *ListCatPopularityReq) (*ListCatPopularityResp, error)
+	AddCatPopularity(context.Context, *AddCatPopularityReq) (*AddCatPopularityResp, error)
+	ListTopCat(context.Context, *ListTopCatReq) (*ListTopCatResp, error)
 	mustEmbedUnimplementedLikeServer()
 }
 
@@ -132,6 +167,15 @@ func (UnimplementedLikeServer) AddScore(context.Context, *AddScoreReq) (*AddScor
 }
 func (UnimplementedLikeServer) DailyUpdate(context.Context, *DailyUpdateReq) (*DailyUpdateResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DailyUpdate not implemented")
+}
+func (UnimplementedLikeServer) ListCatPopularity(context.Context, *ListCatPopularityReq) (*ListCatPopularityResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCatPopularity not implemented")
+}
+func (UnimplementedLikeServer) AddCatPopularity(context.Context, *AddCatPopularityReq) (*AddCatPopularityResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCatPopularity not implemented")
+}
+func (UnimplementedLikeServer) ListTopCat(context.Context, *ListTopCatReq) (*ListTopCatResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTopCat not implemented")
 }
 func (UnimplementedLikeServer) mustEmbedUnimplementedLikeServer() {}
 
@@ -254,6 +298,60 @@ func _Like_DailyUpdate_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Like_ListCatPopularity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCatPopularityReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LikeServer).ListCatPopularity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/like.like/ListCatPopularity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LikeServer).ListCatPopularity(ctx, req.(*ListCatPopularityReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Like_AddCatPopularity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCatPopularityReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LikeServer).AddCatPopularity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/like.like/AddCatPopularity",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LikeServer).AddCatPopularity(ctx, req.(*AddCatPopularityReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Like_ListTopCat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTopCatReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LikeServer).ListTopCat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/like.like/ListTopCat",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LikeServer).ListTopCat(ctx, req.(*ListTopCatReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Like_ServiceDesc is the grpc.ServiceDesc for Like service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -284,6 +382,18 @@ var Like_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DailyUpdate",
 			Handler:    _Like_DailyUpdate_Handler,
+		},
+		{
+			MethodName: "ListCatPopularity",
+			Handler:    _Like_ListCatPopularity_Handler,
+		},
+		{
+			MethodName: "AddCatPopularity",
+			Handler:    _Like_AddCatPopularity_Handler,
+		},
+		{
+			MethodName: "ListTopCat",
+			Handler:    _Like_ListTopCat_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

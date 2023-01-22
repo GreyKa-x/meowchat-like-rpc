@@ -13,19 +13,26 @@ import (
 )
 
 type (
-	AddScoreReq        = pb.AddScoreReq
-	AddScoreResp       = pb.AddScoreResp
-	DailyUpdateReq     = pb.DailyUpdateReq
-	DailyUpdateResp    = pb.DailyUpdateResp
-	DoLikeReq          = pb.DoLikeReq
-	DoLikeResp         = pb.DoLikeResp
-	GetTargetLikesReq  = pb.GetTargetLikesReq
-	GetTargetLikesResp = pb.GetTargetLikesResp
-	GetTopKReq         = pb.GetTopKReq
-	GetTopKResp        = pb.GetTopKResp
-	GetUserLikedReq    = pb.GetUserLikedReq
-	GetUserLikedResp   = pb.GetUserLikedResp
-	ItemScore          = pb.ItemScore
+	AddCatPopularityReq   = pb.AddCatPopularityReq
+	AddCatPopularityResp  = pb.AddCatPopularityResp
+	AddScoreReq           = pb.AddScoreReq
+	AddScoreResp          = pb.AddScoreResp
+	CatPop                = pb.CatPop
+	DailyUpdateReq        = pb.DailyUpdateReq
+	DailyUpdateResp       = pb.DailyUpdateResp
+	DoLikeReq             = pb.DoLikeReq
+	DoLikeResp            = pb.DoLikeResp
+	GetTargetLikesReq     = pb.GetTargetLikesReq
+	GetTargetLikesResp    = pb.GetTargetLikesResp
+	GetTopKReq            = pb.GetTopKReq
+	GetTopKResp           = pb.GetTopKResp
+	GetUserLikedReq       = pb.GetUserLikedReq
+	GetUserLikedResp      = pb.GetUserLikedResp
+	ItemScore             = pb.ItemScore
+	ListCatPopularityReq  = pb.ListCatPopularityReq
+	ListCatPopularityResp = pb.ListCatPopularityResp
+	ListTopCatReq         = pb.ListTopCatReq
+	ListTopCatResp        = pb.ListTopCatResp
 
 	Like interface {
 		// 点赞/取消赞
@@ -37,6 +44,10 @@ type (
 		GetTopK(ctx context.Context, in *GetTopKReq, opts ...grpc.CallOption) (*GetTopKResp, error)
 		AddScore(ctx context.Context, in *AddScoreReq, opts ...grpc.CallOption) (*AddScoreResp, error)
 		DailyUpdate(ctx context.Context, in *DailyUpdateReq, opts ...grpc.CallOption) (*DailyUpdateResp, error)
+		// popularity
+		ListCatPopularity(ctx context.Context, in *ListCatPopularityReq, opts ...grpc.CallOption) (*ListCatPopularityResp, error)
+		AddCatPopularity(ctx context.Context, in *AddCatPopularityReq, opts ...grpc.CallOption) (*AddCatPopularityResp, error)
+		ListTopCat(ctx context.Context, in *ListTopCatReq, opts ...grpc.CallOption) (*ListTopCatResp, error)
 	}
 
 	defaultLike struct {
@@ -81,4 +92,20 @@ func (m *defaultLike) AddScore(ctx context.Context, in *AddScoreReq, opts ...grp
 func (m *defaultLike) DailyUpdate(ctx context.Context, in *DailyUpdateReq, opts ...grpc.CallOption) (*DailyUpdateResp, error) {
 	client := pb.NewLikeClient(m.cli.Conn())
 	return client.DailyUpdate(ctx, in, opts...)
+}
+
+// popularity
+func (m *defaultLike) ListCatPopularity(ctx context.Context, in *ListCatPopularityReq, opts ...grpc.CallOption) (*ListCatPopularityResp, error) {
+	client := pb.NewLikeClient(m.cli.Conn())
+	return client.ListCatPopularity(ctx, in, opts...)
+}
+
+func (m *defaultLike) AddCatPopularity(ctx context.Context, in *AddCatPopularityReq, opts ...grpc.CallOption) (*AddCatPopularityResp, error) {
+	client := pb.NewLikeClient(m.cli.Conn())
+	return client.AddCatPopularity(ctx, in, opts...)
+}
+
+func (m *defaultLike) ListTopCat(ctx context.Context, in *ListTopCatReq, opts ...grpc.CallOption) (*ListTopCatResp, error) {
+	client := pb.NewLikeClient(m.cli.Conn())
+	return client.ListTopCat(ctx, in, opts...)
 }

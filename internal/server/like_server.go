@@ -54,3 +54,19 @@ func (s *LikeServer) DailyUpdate(ctx context.Context, in *pb.DailyUpdateReq) (*p
 	l := logic.NewDailyUpdateLogic(ctx, s.svcCtx)
 	return l.DailyUpdate(in)
 }
+
+// popularity
+func (s *LikeServer) ListCatPopularity(ctx context.Context, in *pb.ListCatPopularityReq) (*pb.ListCatPopularityResp, error) {
+	l := logic.NewListCatPopularityLogic(ctx, s.svcCtx)
+	return l.ListCatPopularity(in)
+}
+
+func (s *LikeServer) AddCatPopularity(ctx context.Context, in *pb.AddCatPopularityReq) (*pb.AddCatPopularityResp, error) {
+	l := logic.NewAddCatPopularityLogic(ctx, s.svcCtx)
+	return l.AddCatPopularity(in)
+}
+
+func (s *LikeServer) ListTopCat(ctx context.Context, in *pb.ListTopCatReq) (*pb.ListTopCatResp, error) {
+	l := logic.NewListTopCatLogic(ctx, s.svcCtx)
+	return l.ListTopCat(in)
+}

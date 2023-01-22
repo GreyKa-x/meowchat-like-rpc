@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"time"
 )
 
@@ -51,7 +52,9 @@ func (c customScoreModel) ListTopK(ctx context.Context, k int64, last int, t str
 	sortStage := bson.D{{"$sort", bson.M{"total_score": -1}}}
 	limitStage := bson.D{{"$limit", k}}
 
-	err := c.conn.Aggregate(ctx, &data, mongo.Pipeline{matchStage, groupStage, sortStage, limitStage})
+	allowDiskUse := true
+	opts := options.AggregateOptions{AllowDiskUse: &allowDiskUse}
+	err := c.conn.Aggregate(ctx, &data, mongo.Pipeline{matchStage, groupStage, sortStage, limitStage}, &opts)
 	if err != nil {
 		return nil, err
 	}
