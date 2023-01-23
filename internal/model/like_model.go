@@ -23,6 +23,9 @@ type (
 
 	CustomLikeModel struct {
 		*defaultLikeModel
+		url string
+		db  string
+		c   cache.CacheConf
 	}
 )
 
@@ -53,5 +56,8 @@ func NewLikeModel(url, db, collection string, c cache.CacheConf) LikeModel {
 	conn := monc.MustNewModel(url, db, collection, c)
 	return &CustomLikeModel{
 		defaultLikeModel: newDefaultLikeModel(conn),
+		url:              url,
+		db:               db,
+		c:                c,
 	}
 }

@@ -4,12 +4,12 @@ Mode: dev
 Log:
   Encoding: plain
 Mongo:
-  URL: $MONGO_URL
-  DB: $MONGO_DB
+  URL: mongodb://localhost
+  DB: like
 CacheConf:
   -
-    Host: $CACHE_REDIS_HOST
-    Pass: $CACHE_REDIS_PASS
+    Host: localhost:6379
+    Pass:
 Redis:
-  Host: $REDIS_HOST
-  Pass: $REDIS_PASS
+  Host: localhost:6379
+  Pass:
