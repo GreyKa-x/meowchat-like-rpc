@@ -3,9 +3,42 @@ package logic
 import (
 	"github.com/xh-polaris/meowchat-like-rpc/internal/model"
 	"github.com/xh-polaris/meowchat-like-rpc/pb"
+	"github.com/zeromicro/go-zero/core/hash"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"math"
+	"sync"
 )
+
+const SEGLOCK_LENGTH = 100
+
+var once sync.Once
+
+type SegLock struct {
+	locks []sync.Mutex
+}
+
+var Lock *SegLock = new(SegLock)
+
+func (sl *SegLock) hashval(key string) uint64 {
+	once.Do(func() {
+		sl.locks = make([]sync.Mutex, SEGLOCK_LENGTH)
+	})
+	return hash.Hash([]byte(key)) % uint64(len(sl.locks))
+}
+
+func (sl *SegLock) lock(key string) {
+	id := sl.hashval(key)
+	sl.locks[id].Lock()
+}
+func (sl *SegLock) trylock(key string) {
+	id := sl.hashval(key)
+	sl.locks[id].TryLock()
+}
+
+func (sl *SegLock) unlock(key string) {
+	id := sl.hashval(key)
+	sl.locks[id].Unlock()
+}
 
 func toCatPop(cats []model.CatPop) []*pb.CatPop {
 	ret := make([]*pb.CatPop, len(cats))
