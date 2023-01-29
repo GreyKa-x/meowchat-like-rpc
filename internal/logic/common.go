@@ -1,6 +1,8 @@
 package logic
 
 import (
+	"context"
+	"github.com/xh-polaris/meowchat-like-rpc/errorx"
 	"github.com/xh-polaris/meowchat-like-rpc/internal/model"
 	"github.com/xh-polaris/meowchat-like-rpc/pb"
 	"github.com/zeromicro/go-zero/core/hash"
@@ -11,33 +13,34 @@ import (
 
 const SEGLOCK_LENGTH = 100
 
-var once sync.Once
+var Lock = new(SegLock)
 
-type SegLock struct {
-	locks []sync.Mutex
+type SegLock [SEGLOCK_LENGTH]sync.Mutex
+
+func (sl *SegLock) hash(key string) uint64 {
+	return hash.Hash([]byte(key)) % uint64(len(sl))
 }
 
-var Lock *SegLock = new(SegLock)
-
-func (sl *SegLock) hashval(key string) uint64 {
-	once.Do(func() {
-		sl.locks = make([]sync.Mutex, SEGLOCK_LENGTH)
-	})
-	return hash.Hash([]byte(key)) % uint64(len(sl.locks))
+func (sl *SegLock) lock(ctx context.Context, key string) error {
+	id := sl.hash(key)
+	sl[id].Lock()
+	select {
+	case <-ctx.Done():
+		sl[id].Unlock()
+		return errorx.ErrOutOfTime
+	default:
+		return nil
+	}
 }
 
-func (sl *SegLock) lock(key string) {
-	id := sl.hashval(key)
-	sl.locks[id].Lock()
-}
-func (sl *SegLock) trylock(key string) {
-	id := sl.hashval(key)
-	sl.locks[id].TryLock()
+func (sl *SegLock) trylock(key string) bool {
+	id := sl.hash(key)
+	return sl[id].TryLock()
 }
 
 func (sl *SegLock) unlock(key string) {
-	id := sl.hashval(key)
-	sl.locks[id].Unlock()
+	id := sl.hash(key)
+	sl[id].Unlock()
 }
 
 func toCatPop(cats []model.CatPop) []*pb.CatPop {

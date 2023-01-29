@@ -32,11 +32,14 @@ Range > 1 时，拼出 cacheKey 在 Redis 里取数据，若不存在，访问�
 目的是过滤重复请求，相同请求同一时刻只有一个打入数据库，同时分段数量限制了最大数据库并发量，顺带缓解缓存雪崩问题
 */
 func (l *GetTopKLogic) GetTopK(in *pb.GetTopKReq) (*pb.GetTopKResp, error) {
-
+	l.ctx.Done()
 	if in.Range > 1 {
 		// 长期数据
 		cacheKey := fmt.Sprintf("cache:score_%s_%d_%d", in.Type, in.Range, in.K)
-		Lock.lock(cacheKey)
+		err := Lock.lock(l.ctx, cacheKey)
+		if err != nil {
+			return nil, err
+		}
 		defer Lock.unlock(cacheKey)
 		d, err := l.svcCtx.Redis.ZrangeWithScoresCtx(l.ctx, cacheKey, 0, -1)
 		if err != nil {
