@@ -23,12 +23,25 @@ func NewGetTopKLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetTopKLo
 	}
 }
 
+// GetTopK
+/*
+函数逻辑：
+Range == 1 时，直接从 Redis 访问当日数据
+Range > 1 时，拼出 cacheKey 在 Redis 里取数据，若不存在，访问数据库提取数据入 Redis。
+访问 Redis 前进行分段加锁，把 cacheKey hash 到一个数，作为 id ，对此 id 的锁加锁，
+目的是过滤重复请求，相同请求同一时刻只有一个打入数据库，同时分段数量限制了最大数据库并发量，顺带缓解缓存雪崩问题
+*/
 func (l *GetTopKLogic) GetTopK(in *pb.GetTopKReq) (*pb.GetTopKResp, error) {
-
+	l.ctx.Done()
 	if in.Range > 1 {
 		// 长期数据
-		cachekey := fmt.Sprintf("cache:score_%s_%d_%d", in.Type, in.Range, in.K)
-		d, err := l.svcCtx.Redis.ZrangeWithScoresCtx(l.ctx, cachekey, 0, -1)
+		cacheKey := fmt.Sprintf("cache:score_%s_%d_%d", in.Type, in.Range, in.K)
+		err := Lock.lock(l.ctx, cacheKey)
+		if err != nil {
+			return nil, err
+		}
+		defer Lock.unlock(cacheKey)
+		d, err := l.svcCtx.Redis.ZrangeWithScoresCtx(l.ctx, cacheKey, 0, -1)
 		if err != nil {
 			return nil, err
 		}
@@ -42,11 +55,11 @@ func (l *GetTopKLogic) GetTopK(in *pb.GetTopKReq) (*pb.GetTopKResp, error) {
 			if err != nil {
 				return nil, err
 			}
-			_, err = l.svcCtx.Redis.ZaddsCtx(l.ctx, cachekey, aggrToPair(data)...)
+			_, err = l.svcCtx.Redis.ZaddsCtx(l.ctx, cacheKey, aggrToPair(data)...)
 			if err != nil {
 				return nil, err
 			}
-			err = l.svcCtx.Redis.Expire(cachekey, getExpireTime(in.Range))
+			err = l.svcCtx.Redis.Expire(cacheKey, getExpireTime(in.Range))
 			if err != nil {
 				return nil, err
 			}
