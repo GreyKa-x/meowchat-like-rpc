@@ -15,11 +15,12 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
+	cache := c.Redis.NewRedis()
 	return &ServiceContext{
 		Config:             c,
 		LikeModel:          model.NewLikeModel(c.Mongo.URL, c.Mongo.DB, model.LikeCollectionName, c.CacheConf),
-		ScoreModel:         model.NewScoreModel(c.Mongo.URL, c.Mongo.DB, model.ScoreCollectionName),
+		ScoreModel:         model.NewScoreModel(c.Mongo.URL, c.Mongo.DB, model.ScoreCollectionName, cache),
 		CatPopularityModel: model.NewCatPopularityModel(c.Mongo.URL, c.Mongo.DB, model.PopularityCollectionName),
-		Redis:              c.Redis.NewRedis(),
+		Redis:              cache,
 	}
 }

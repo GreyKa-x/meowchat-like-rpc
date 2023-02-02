@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"github.com/xh-polaris/meowchat-like-rpc/internal/model"
 	"github.com/xh-polaris/meowchat-like-rpc/internal/svc"
 	"github.com/xh-polaris/meowchat-like-rpc/pb"
 
@@ -28,5 +29,5 @@ func (l *ListCatPopularityLogic) ListCatPopularity(in *pb.ListCatPopularityReq) 
 	if err != nil {
 		return nil, err
 	}
-	return &pb.ListCatPopularityResp{Cats: toCatPop(popularity)}, nil
+	return &pb.ListCatPopularityResp{Cats: model.ToCatPop(popularity)}, nil
 }
