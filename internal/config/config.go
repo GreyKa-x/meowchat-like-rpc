@@ -14,4 +14,9 @@ type Config struct {
 	}
 	CacheConf cache.CacheConf
 	Redis     redis.RedisConf
+	MqConf    struct {
+		NameServer []string
+		Retry      int
+		GroupName  string
+	}
 }

@@ -1,5 +1,5 @@
 Name: like.rpc
-ListenOn: 127.0.0.1:8080
+ListenOn: 127.0.0.1:8070
 Mode: dev
 Log:
   Encoding: plain
@@ -13,3 +13,8 @@ CacheConf:
 Redis:
   Host: localhost:6379
   Pass:
+MqConf:
+  NameServer:
+    - 127.0.0.1:9876
+  Retry: 2
+  GroupName: LikeRpc

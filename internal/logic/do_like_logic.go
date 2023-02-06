@@ -5,8 +5,10 @@ import (
 	"github.com/xh-polaris/meowchat-like-rpc/errorx"
 	"github.com/xh-polaris/meowchat-like-rpc/internal/model"
 	"github.com/xh-polaris/meowchat-like-rpc/internal/svc"
+	like2 "github.com/xh-polaris/meowchat-like-rpc/like"
 	"github.com/xh-polaris/meowchat-like-rpc/pb"
 	"github.com/zeromicro/go-zero/core/logx"
+	"time"
 )
 
 type DoLikeLogic struct {
@@ -45,6 +47,20 @@ func (l *DoLikeLogic) DoLike(in *pb.DoLikeReq) (*pb.DoLikeResp, error) {
 		}
 		err := likeModel.Insert(l.ctx, like)
 		if err == nil {
+
+			msg := like2.LikeMsg{
+				Id:           like.ID.Hex(),
+				UserId:       like.UserId,
+				TargetId:     like.TargetId,
+				TargetType:   like.TargetType,
+				AssociatedId: like.AssociatedId,
+				Time:         like.CreateAt.Unix(),
+			}
+			err := l.svcCtx.MsgQ.SendCreateAsync(msg)
+			if err != nil {
+				logx.Error(err)
+			}
+
 			return &pb.DoLikeResp{}, nil
 		} else {
 			return &pb.DoLikeResp{}, errorx.ErrDataBase
@@ -57,6 +73,20 @@ func (l *DoLikeLogic) DoLike(in *pb.DoLikeReq) (*pb.DoLikeResp, error) {
 		}
 		err = likeModel.Delete(l.ctx, ID)
 		if err == nil {
+
+			msg := like2.LikeMsg{
+				Id:           ID,
+				UserId:       in.UserId,
+				TargetId:     in.TargetId,
+				TargetType:   in.Type,
+				AssociatedId: in.AssociatedId,
+				Time:         time.Now().Unix(),
+			}
+			err := l.svcCtx.MsgQ.SendDeleteAsync(msg)
+			if err != nil {
+				logx.Error(err)
+			}
+
 			return &pb.DoLikeResp{}, nil
 		} else {
 			return &pb.DoLikeResp{}, errorx.ErrDataBase
